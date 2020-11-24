@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerBehaviour : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class PlayerBehaviour : MonoBehaviour
 
     [Header("Player Abilities")]
     public int health;
+    public int lives;
+    public Animator livesState;
     public HealthBar healthBar;
 
     private Rigidbody2D m_rigidBody2D;
@@ -38,6 +41,7 @@ public class PlayerBehaviour : MonoBehaviour
     void Start()
     {
         health = 100;
+        lives = 3;
 
         m_rigidBody2D = GetComponent<Rigidbody2D>();
         m_spriteRenderer = GetComponent<SpriteRenderer>();
@@ -175,7 +179,7 @@ public class PlayerBehaviour : MonoBehaviour
         // respawn
         if (other.gameObject.CompareTag("DeathPlane"))
         {
-            transform.position = spawnPoint.position;
+            LoseLife();
         }
 
         if (other.gameObject.CompareTag("Bullet"))
@@ -184,10 +188,48 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+    public void LoseLife()
+    {
+        Debug.Log("Loselife");
+        lives -= 1;
+
+        switch(lives)
+        {
+            case 2:
+                livesState.SetInteger("LivesState", 2);
+                break;
+
+            case 1:
+                livesState.SetInteger("LivesState", 1);
+                break;
+
+            case 0:
+                livesState.SetInteger("LivesState", 0);
+                break;
+        }
+
+        if(lives > 0)
+        {
+            health = 100;
+            healthBar.SetValue(100);
+
+            transform.position = spawnPoint.position;
+        }
+        else
+        {
+            SceneManager.LoadScene("End");
+        }
+    }
+
     public void TakeDamage(int damage)
     {
         health -= damage;
         healthBar.SetValue(health);
+
+        if(health < 1)
+        {
+            LoseLife();
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
