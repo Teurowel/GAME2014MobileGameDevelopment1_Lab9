@@ -5,21 +5,29 @@ using UnityEngine;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+    [Header("Controls")]
     public Joystick joystick;
     public float joystickHorizontalSensitivity;
     public float joystickVerticalSensitivity;
     public float horizontalForce;
     public float verticalForce;
+    
+    [Header("Platform Related")]
     public bool isGrounded;
     public bool isJumping;
     public bool isCrouching;
-    public Transform spawnPoint;
     public Transform lookAheadPoint;
     public Transform lookInFrontPoint;
     public LayerMask collisionGroundLayer;
     public LayerMask collisionWallLayer;
     public RampDirection rampDirection;
     public bool onRamp;
+
+    public Transform spawnPoint;
+
+    [Header("Player Abilities")]
+    public int health;
+    public HealthBar healthBar;
 
     private Rigidbody2D m_rigidBody2D;
     private SpriteRenderer m_spriteRenderer;
@@ -29,6 +37,8 @@ public class PlayerBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        health = 100;
+
         m_rigidBody2D = GetComponent<Rigidbody2D>();
         m_spriteRenderer = GetComponent<SpriteRenderer>();
         m_animator = GetComponent<Animator>();
@@ -166,6 +176,25 @@ public class PlayerBehaviour : MonoBehaviour
         if (other.gameObject.CompareTag("DeathPlane"))
         {
             transform.position = spawnPoint.position;
+        }
+
+        if (other.gameObject.CompareTag("Bullet"))
+        {
+            TakeDamage(10);
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+        healthBar.SetValue(health);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.CompareTag("Enemy"))
+        {
+            TakeDamage(15);
         }
     }
 }
