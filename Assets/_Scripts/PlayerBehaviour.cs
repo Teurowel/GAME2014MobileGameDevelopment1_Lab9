@@ -193,20 +193,7 @@ public class PlayerBehaviour : MonoBehaviour
         Debug.Log("Loselife");
         lives -= 1;
 
-        switch(lives)
-        {
-            case 2:
-                livesState.SetInteger("LivesState", 2);
-                break;
-
-            case 1:
-                livesState.SetInteger("LivesState", 1);
-                break;
-
-            case 0:
-                livesState.SetInteger("LivesState", 0);
-                break;
-        }
+        livesState.SetInteger("LivesState", lives);
 
         if(lives > 0)
         {
